@@ -1,0 +1,167 @@
+---
+title: "Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+install.packages("corrplot")
+library(tidyverse)
+library(corrplot)
+
+```
+
+
+## Topic 1
+
+### Exercise 
+
+*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+
+Write the R code required to add two plus two:
+
+
+```{r}
+
+mydata <- read.csv("MET Office Weather Data.csv")
+mydata
+```
+
+```{r}
+mydata_cor <- select(mydata, rain, tmax,
+                             tmin, af)
+M <- cor(mydata_cor, use="pairwise.complete.obs")
+corrplot(M, method = "shade")
+
+
+```
+
+```{r}
+set.seed(1)
+training_set <- sample(seq_len(nrow(mydata)), size = floor(0.75 * nrow(mydata)))
+train <- mydata[training_set, ]
+test <- mydata[-training_set, ]
+```
+
+
+## Model 1
+
+dependent: rain
+Indepenent: Max Temperature
+
+question dose on the max temperature have any effect on the amount of rain fall 
+
+```{r}
+model1 <- lm(tmax ~ rain,mydata)
+test1 <- data.frame(rain = c(6))
+predictMaxTemp <- predict(model1, test1)
+cat("The Max Temp (c) in UK will be: ", predictMaxTemp , "(c).")
+
+```
+```{r}
+ggplot(mydata, aes(x= rain, y= tmax))+
+  geom_point(aes(color = tmax ))+
+  theme(legend.position = "none")+
+  labs(title = "Rain vs Max Temperature", subtitle = "UK 1853 - 2020",
+       x = "Rain Fall C°", y = "Max Temperature C°")
+```
+seems like rain fall is slowly going down in the uk
+
+
+
+##Model 2
+
+dependent: rain
+Indepenent: Min Temperature
+
+```{r}
+model2 <- lm(tmin ~ rain,mydata)
+test2 <- data.frame(rain = c(6))
+predictMinTemp <- predict(model2, test2)
+cat("The Min Temp (c) in UK  will be:", 
+    predictMinTemp , "(c).")
+```
+
+
+
+
+```{r}
+ggplot(mydata, aes(x= rain, y= tmin))+
+  geom_point(aes(color = tmin))+
+  theme(legend.position = "none")+
+  labs(title = "Rain vs Min Temperature", subtitle = "UK 1853 - 2020",
+       x = "Rain Fall C°", y = "Min Temperature C°")
+```
+
+##model 3
+
+dependent: sun
+Independent: Max Temperature
+
+```{r}
+model3 <- lm( tmax ~ sun ,mydata)
+test3 <- data.frame(sun = c(7))
+predictheat <- predict(model3, test3)
+cat("The predicted Sun and max temperature in UK will be", predictheat )
+```
+
+
+```{r}
+ggplot(mydata, aes(x = tmax, y = sun))+
+  geom_point(aes(color = sun))+
+  theme(legend.position = "none")+
+  labs(title = "Max Temperature vs Sun", subtitle = "UK 1853 - 2020",
+        x = "Max Temperature C°", y = "Sun")
+```
+
+
+
+##model 4
+
+Discrete 
+
+dependent: air frost
+Independent: Month
+
+```{r}
+model3 <- lm( month ~ af ,mydata)
+test3 <- data.frame(af = c(5))
+predictheat <- predict(model3, test3)
+cat("The predicted air frost in UK will be", predictheat )
+```
+
+af means Days of air frost recorded that month (days)
+
+
+```{r}
+ggplot(mydata, aes(x = month, y = af))+
+  geom_point(aes(color = af))+
+  theme(legend.position = "none")+
+  labs(title = "Month vs  Air Frost", subtitle = "UK 1853 - 2020",
+        x = " Month ", y = " Air Frost")
+```
+
+
+##model 5
+
+
+dependent: Min Temperature
+Independent: Max Temperature
+
+```{r}
+model3 <- lm( tmax ~ tmin ,mydata)
+test3 <- data.frame(tmin = c(4))
+predictheat <- predict(model3, test3)
+cat("The Min Temp (c) in UK  will be:", predictheat )
+```
+
+af means Days of air frost recorded that month (days)
+
+
+```{r}
+ggplot(mydata, aes(x = tmax, y = tmin))+
+  geom_point(aes(color = tmin))+
+  theme(legend.position = "none")+
+  labs(title = "Max Temperature vs  Min Temperature", subtitle = "UK 1853 - 2020",
+        x = " Max Temperature ", y = " Min Temperature")
+```
